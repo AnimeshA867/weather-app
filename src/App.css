@@ -36,3 +36,9 @@
     transform: rotate(360deg);
   }
 }
+
+.bg-image {
+  background-image: url("Components/background.png");
+  background-position: center;
+  background-size: cover;
+}
