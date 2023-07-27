@@ -7,7 +7,7 @@ export default function WeatherCard(props) {
 
   const [status, setStatus] = useState(false); //Status of response.
   const [loading, setLoading] = useState(true); //Loading status
-  let start = true;
+
   const [data, setData] = useState(""); //Json data
 
   //To fetch data
@@ -19,19 +19,18 @@ export default function WeatherCard(props) {
   for (let i = 1; i < arr.length; i++) {
     cityName = cityName.concat("+", arr[i]);
   }
-  console.log(cityName);
 
   let fetchData = async () => {
-    start = false;
     setLoading(true);
     let dataReceived;
     try {
       const response = await fetch(
-        `${apiUrl}${cityName}&appid=09195acd9dfbb927b7f6b925bba707ed`
+        `${apiUrl}${cityName}${
+          props.country === "" ? `` : `,${props.country}`
+        }&appid=${props.apiKey}`
       );
-      console.log("City receiving: " + props.city);
+
       response.status !== 200 ? setStatus(false) : setStatus(true);
-      console.log("The valueo of response status is : " + response.status);
 
       if (response.status === 200) {
         dataReceived = await response.json();
@@ -40,7 +39,6 @@ export default function WeatherCard(props) {
         setLoading(false);
       }
     } finally {
-      console.log(dataReceived);
       setLoading(false);
     }
   };
@@ -55,21 +53,19 @@ export default function WeatherCard(props) {
       } else if (data.weather[0].main === `Rain`) {
         weatherIcon.src = "https://i.ibb.co/mzh0m5p/rain.png";
       } else if (data.weather[0].main === `Drizzle`) {
-        weatherIcon.src = "https://i.ibb.co/RY0M1MB.Drizzle.png";
+        weatherIcon.src = "https://i.ibb.co/RY0M1MB/Drizzle.png";
       } else if (data.weather[0].main === `Mist`) {
-        weatherIcon.src = "https://i.ibb.co/n3F5CBx.mist.png";
+        weatherIcon.src = "https://i.ibb.co/n3F5CBx/mist.png";
       } else if (data.weather[0].main === `Snow`) {
-        weatherIcon.src = "https://i.ibb.co/NpKkKKq.snow.png";
+        weatherIcon.src = "https://i.ibb.co/NpKkKKq/snow.png";
+      } else if (data.weather[0].main === "Haze") {
+        weatherIcon.src = "https://i.ibb.co/JxBXxq7/haze.png";
       }
+      weatherIcon.alt = data.weather[0].main;
     }
-    // console.log(weatherIcon.src);
   };
 
-  useEffect(() => {
-    console.log("The status is " + status);
-
-    // console.log(weatherSrc);
-  }, [status]);
+  useEffect(() => {}, [status]);
 
   useEffect(() => {
     fetchData();
@@ -80,12 +76,26 @@ export default function WeatherCard(props) {
 
   useEffect(() => {
     fetchData();
-    console.log("The recieved city is: " + props.city);
   }, [props.city]);
 
   return data !== "" ? (
     loading ? (
-      <p>Loading....</p>
+      <div class="loadingio-spinner-spinner-8spo57eywz5">
+        <div class="ldio-w7f8112p16">
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+      </div>
     ) : status ? (
       <div className="h-6/12 w-10/12  flex flex-row gap-4 justify-center items-center  rounded-xl flex-col">
         <div className=" h-36 w-48  ">
@@ -132,7 +142,7 @@ export default function WeatherCard(props) {
                     {data.clouds.all}
                     <span>%</span>
                   </p>
-                  <p className="text-[1.5rem] font-semibold">Humidity</p>
+                  <p className="text-[1.65rem] font-semibold">Clouds</p>
                 </div>
               </div>
             </div>
@@ -149,7 +159,7 @@ export default function WeatherCard(props) {
     )
   ) : (
     <>
-      <div className="text-[3.8rem] text-white w-[80%] text-center font-bold">
+      <div className="text-[2.9rem] text-white w-[80%] text-center font-semibold">
         Enter the name of the city to begin.
       </div>
     </>

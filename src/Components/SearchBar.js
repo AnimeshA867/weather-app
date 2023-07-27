@@ -2,7 +2,8 @@ import React from "react";
 import { useState, useEffect } from "react";
 import List from "./List";
 export default function SearchBar(props) {
-  const geonamesApiUrl = "http://api.geonames.org/searchJSON?q=";
+  // const geonamesApiUrl = "http://api.geonames.org/searchJSON?q=";
+  const geonamesApiUrl = "http://api.geonames.org/searchJSON?name_startsWith=";
   const geonamesUsername = "Animesh867"; // Replace this with your Geonames username
   const [location, setLocation] = useState("");
   const [suggestions, setSuggestions] = useState([]);
@@ -11,14 +12,11 @@ export default function SearchBar(props) {
   const fetchSuggestions = async () => {
     try {
       const response = await fetch(
-        `${geonamesApiUrl}${input}&maxRows=5&username=${geonamesUsername}`
+        `${geonamesApiUrl}${input}&maxRows=5&username=${geonamesUsername}&featurecode=ppl&featureClass=p`
       );
       const data = await response.json();
       setSuggestions(data.geonames);
-      console.log(data);
-    } catch (error) {
-      console.error("Error fetching suggestions:", error);
-    }
+    } catch (error) {}
   };
 
   useEffect(() => {
@@ -26,7 +24,6 @@ export default function SearchBar(props) {
   }, [input]);
 
   useEffect(() => {
-    console.log("This use effect is being called.");
     props.finalVal(location);
   }, [location]);
 
@@ -65,16 +62,19 @@ export default function SearchBar(props) {
             id={"suggestion"}
             className={` h-fit w-[80%] flex gap-2 flex-col text-white absolute top-[27%] p-6 rounded-xl left-[9%] backdrop-blur-2xl bg-black/50 ${
               suggestions.length > 0 ? "flex" : "hidden"
-            } ${location.length > 0 ? "hidden" && setLocation("") : "flex"}`}
+            } ${!props.pressed ? "flex" : "hidden"} ${
+              location.length > 0 ? "hidden" && setLocation("") : "flex"
+            }`}
           >
             {suggestions.map((element) => {
               return (
                 <>
                   <List
                     cityName={element.name}
-                    country={element.countryName}
+                    country={element.countryCode}
                     setLocation={setLocation}
                     setInput={setInput}
+                    setCountry={props.setCountry}
                   />
                 </>
               );
@@ -82,7 +82,9 @@ export default function SearchBar(props) {
           </div>
 
           <span
-            className="absolute right-[1%] top-[27%] text-[2.6rem] bg-white rounded-xl w-[3rem] text-center cursor-pointer duration-500 ease-in-out select-none"
+            className={`absolute right-[1%] top-[27%] text-[2.6rem] bg-white rounded-xl w-[3rem] text-center cursor-pointer duration-500 ease-in-out select-none ${
+              suggestions.length > 0 && !props.pressed ? "flex" : "hidden"
+            }  ${location.length > 0 ? "hidden" && setLocation("") : "flex"}`}
             id="cross"
             onClick={() => {
               let suggestion = document.getElementById("suggestion");
